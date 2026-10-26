@@ -1,0 +1,1179 @@
+/* The side panel. Design tokens are in tokens.css. */
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  height: 100%;
+  margin: 0;
+}
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font);
+  font-size: var(--fs);
+  user-select: none;
+  cursor: default;
+  display: flex;
+  flex-direction: column;
+}
+
+.list {
+  position: relative; /* the drop line is placed inside it */
+  flex: 1;
+  overflow-y: auto;
+  scrollbar-width: thin;
+  padding: var(--panel-pad);
+}
+
+/* Rows: links, folder headers, the "empty folder" placeholder. */
+.row {
+  display: flex;
+  align-items: center;
+  gap: var(--gap-x);
+  width: 100%;
+  height: var(--row-h);
+  padding: 0 var(--pad-x) 0 calc(var(--pad-x) + var(--depth, 0) * var(--indent));
+  border: none;
+  border-radius: var(--radius);
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  text-align: left;
+  cursor: default;
+}
+
+button.row:hover,
+.item:hover > .row {
+  background: var(--hover);
+}
+
+/* The link whose tab is selected. */
+.item.is-active > .row {
+  background: var(--active);
+  box-shadow: var(--active-shadow);
+}
+
+button:focus-visible {
+  outline: var(--focus-ring) solid var(--accent);
+  outline-offset: calc(-1 * var(--focus-ring));
+}
+
+.icon {
+  flex: none;
+  width: var(--icon);
+  height: var(--icon);
+  display: grid;
+  place-items: center;
+}
+
+.icon img,
+.icon svg {
+  width: 100%;
+  height: 100%;
+}
+
+.folder-icon {
+  color: var(--text-muted);
+}
+
+.emoji {
+  font-size: var(--icon);
+  line-height: 1;
+}
+
+/* A pictogram (stage 8g): one color, the text's, in both themes. */
+.pictogram {
+  color: var(--text);
+}
+
+/* A folder's icon opens the icon picker: it gets its own hover. */
+.folder-row .icon {
+  border-radius: calc(var(--radius) / 2);
+}
+
+.folder-row .icon:hover {
+  background: var(--hover);
+  box-shadow: 0 0 0 var(--icon-hover-pad) var(--hover);
+}
+
+.fallback-icon {
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  background: hsl(var(--hue) var(--fallback-s) var(--fallback-l));
+  color: var(--fallback-text);
+  font-size: var(--fallback-fs);
+  font-weight: var(--fw-folder);
+  line-height: 1;
+}
+
+.title {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  white-space: nowrap;
+}
+
+/* Long names fade out instead of ending with "…". Set from JS only when clipped. */
+.title.is-clipped {
+  mask-image: linear-gradient(to right, black calc(100% - var(--fade)), transparent);
+}
+
+.folder-row .title {
+  flex: 0 1 auto;
+  font-weight: var(--fw-folder);
+}
+
+.chevron {
+  flex: none;
+  width: var(--chevron);
+  height: var(--chevron);
+  color: var(--text-muted);
+  transition: transform var(--dur) ease;
+}
+
+.folder.is-expanded > .folder-row .chevron {
+  transform: rotate(90deg);
+}
+
+/* Expand/collapse: animate the row track from 0 to the content height. */
+.children {
+  display: grid;
+  grid-template-rows: 0fr;
+  transition: grid-template-rows var(--dur) ease;
+}
+
+.folder.is-expanded > .children {
+  grid-template-rows: 1fr;
+}
+
+.children-inner {
+  min-height: 0;
+  overflow: hidden;
+}
+
+.empty-folder {
+  color: var(--text-muted);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .chevron,
+  .children {
+    transition: none;
+  }
+}
+
+/* Links and open tabs: hover actions (↩, ×) lie on top of the row's right edge. */
+.item {
+  position: relative;
+}
+
+.row-actions {
+  position: absolute;
+  top: 0;
+  right: calc(var(--pad-x) / 2);
+  height: var(--row-h);
+  display: flex;
+  align-items: center;
+  visibility: hidden;
+}
+
+.item:is(:hover, :focus-within) > .row-actions {
+  visibility: visible;
+}
+
+.action {
+  display: none;
+  width: var(--action);
+  height: var(--action);
+  padding: 0;
+  border: none;
+  border-radius: calc(var(--radius) - 2px);
+  background: transparent;
+  color: var(--text-muted);
+  cursor: default;
+  place-items: center;
+}
+
+.action svg {
+  width: var(--action-icon);
+  height: var(--action-icon);
+}
+
+.action:hover {
+  background: var(--hover);
+  color: var(--text);
+}
+
+.item.is-open .action[data-action="close"],
+.item.is-moved .action[data-action="revert"] {
+  display: grid;
+}
+
+/* The speaker (stage 5): always in sight while the tab plays sound or is muted, at the
+   very right, so it doesn't move when × and ↩ show up on hover. */
+.action .sound-off,
+.is-muted .action .sound-on {
+  display: none;
+}
+
+.is-muted .action .sound-off {
+  display: block;
+}
+
+.item:is(.is-playing, .is-muted) .action[data-action="sound"] {
+  display: grid;
+  visibility: visible;
+}
+
+/* While actions are shown the title fades out before them, so text never runs under the icons. */
+.item.is-open {
+  --actions-n: 1;
+}
+
+.item.is-open.is-moved {
+  --actions-n: 2;
+}
+
+.item:is(.is-playing, .is-muted) {
+  --sound-n: 1;
+}
+
+.item:is(.is-playing, .is-muted) .title,
+.item.is-open:is(:hover, :focus-within) .title {
+  --cover: calc(var(--sound-n, 0) * var(--action) + var(--pad-x) / 2 - var(--pad-x));
+  mask-image: linear-gradient(to right, black calc(100% - var(--cover) - var(--fade)), transparent calc(100% - var(--cover)));
+}
+
+.item.is-open:is(:hover, :focus-within) .title {
+  --cover: calc((var(--actions-n) + var(--sound-n, 0)) * var(--action) + var(--pad-x) / 2 - var(--pad-x));
+}
+
+/* A pair: the actions lie over the right half only. */
+.item.is-pair > .row .title {
+  mask-image: none;
+}
+
+.item.is-pair > .row .title.is-clipped {
+  mask-image: linear-gradient(to right, black calc(100% - var(--fade)), transparent);
+}
+
+/* Split view (stage 5b): two tabs side by side as one row. The row itself is the left tab
+   (a link, or a tab below the divider) and ends in the middle of the row's content; the
+   right tab is a half on top of the rest, past a thin upright line. */
+.item.is-pair > .row {
+  padding-right: calc((100% - var(--depth, 0) * var(--indent)) / 2 + var(--pair-gap) / 2);
+}
+
+.pair-half {
+  position: absolute;
+  top: 0;
+  right: 0;
+  left: calc((100% + var(--depth, 0) * var(--indent)) / 2 + var(--pair-gap) / 2);
+  height: var(--row-h);
+  display: flex;
+  align-items: center;
+  gap: var(--gap-x);
+  padding: 0 var(--pad-x) 0 0;
+  border: none;
+  border-radius: var(--radius);
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  text-align: left;
+  cursor: default;
+}
+
+.pair-half::before {
+  content: "";
+  position: absolute;
+  top: calc((var(--row-h) - var(--icon)) / 2);
+  left: calc((var(--pair-gap) + var(--pair-divider)) / -2);
+  width: var(--pair-divider);
+  height: var(--icon);
+  background: var(--divider);
+}
+
+/* The half of a selected pair that isn't the selected tab. */
+.title.is-dimmed {
+  color: var(--text-muted);
+}
+
+/* Open tabs below the divider. The air above the divider belongs to the tree, so a drop
+   there goes to the end of the tree. */
+#tree {
+  padding-bottom: var(--folder-gap);
+}
+
+.divider {
+  height: var(--divider-w);
+  margin-bottom: var(--folder-gap);
+  background: var(--divider);
+}
+
+.new-tab-row {
+  color: var(--text-muted);
+}
+
+.new-tab-row .icon {
+  color: var(--text-muted);
+}
+
+/* Loading: a spinner instead of the site icon; shown after a short delay so quick
+   loads (in-page navigation) don't blink. */
+.icon > * {
+  grid-area: 1 / 1;
+}
+
+.spinner {
+  visibility: hidden;
+  color: var(--text-muted);
+}
+
+.is-loading > .icon > .spinner {
+  visibility: visible;
+  transition: visibility 0s var(--loading-delay);
+  animation: spin 800ms linear infinite;
+}
+
+.is-loading > .icon > :not(.spinner) {
+  visibility: hidden;
+  transition: visibility 0s var(--loading-delay);
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .is-loading > .icon > .spinner {
+    animation: none;
+  }
+}
+
+/* Favorites: a grid of tiles above the tree that stays on top while the list scrolls.
+   It covers the list's top padding (and keeps it inside), so the tree scrolls under it.
+   Sticky offsets count from inside the list's padding, hence the negative top. */
+.favorites {
+  display: none;
+  position: sticky;
+  top: calc(-1 * var(--panel-pad));
+  z-index: 1;
+  margin: calc(-1 * var(--panel-pad)) calc(-1 * var(--panel-pad)) 0;
+  padding: var(--panel-pad) var(--panel-pad) var(--folder-gap);
+  background: var(--bg);
+}
+
+.favorites.has-tiles,
+.list.can-drop-favorite .favorites {
+  display: block;
+}
+
+.tiles {
+  display: grid;
+  grid-template-columns: repeat(var(--tile-cols, 2), minmax(0, 1fr));
+  gap: var(--tile-gap);
+}
+
+.tile-row {
+  display: grid;
+  place-items: center;
+  width: 100%;
+  height: var(--tile-h);
+  padding: 0;
+  border: none;
+  border-radius: var(--radius);
+  background: var(--tile-bg);
+  color: inherit;
+  cursor: default;
+}
+
+.tile:hover > .tile-row,
+.tile.is-menu-target > .tile-row {
+  background: var(--tile-hover);
+}
+
+.tile.is-active > .tile-row {
+  background: var(--active);
+  box-shadow: var(--active-shadow);
+}
+
+/* × in the corner of an open tile, on hover or keyboard focus (not after a click: the
+   tile keeps focus, and a lone × on the selected tile would stay in sight). */
+.tile {
+  position: relative;
+}
+
+.tile-close {
+  position: absolute;
+  top: var(--tile-action-inset);
+  right: var(--tile-action-inset);
+  width: var(--tile-action);
+  height: var(--tile-action);
+}
+
+.tile.is-open:is(:hover, :has(:focus-visible)) > .tile-close {
+  display: grid;
+}
+
+/* The speaker of a tile: in the other corner, always in sight. */
+.tile-sound {
+  position: absolute;
+  top: var(--tile-action-inset);
+  left: var(--tile-action-inset);
+  width: var(--tile-action);
+  height: var(--tile-action);
+}
+
+.tile:is(.is-playing, .is-muted) > .tile-sound {
+  display: grid;
+}
+
+.tile.is-editing > :is(.tile-close, .tile-sound),
+.tile.is-dragging > :is(.tile-close, .tile-sound) {
+  display: none;
+}
+
+.tile-icon {
+  width: var(--tile-icon);
+  height: var(--tile-icon);
+  display: grid;
+  place-items: center;
+}
+
+.tile-icon img {
+  width: 100%;
+  height: 100%;
+}
+
+/* No tiles yet: while something is dragged, an empty place to drop it. */
+.favorites-drop {
+  display: none;
+  place-items: center;
+  height: var(--tile-h);
+  padding: 0 var(--pad-x);
+  border-radius: var(--radius);
+  background: var(--tile-bg);
+  color: var(--text-muted);
+  text-align: center;
+}
+
+.list.can-drop-favorite .favorites:not(.has-tiles) .favorites-drop {
+  display: grid;
+}
+
+.favorites-drop.is-drop-inside {
+  background: var(--active);
+  box-shadow: inset 0 0 0 var(--field-border) var(--accent);
+}
+
+/* Renaming a tile: the field lies over its whole row of tiles. */
+.field.is-wide {
+  top: calc(var(--field-top) + (var(--tile-h) - var(--field-h)) / 2);
+  left: var(--panel-pad);
+  right: var(--panel-pad);
+}
+
+/* Empty states. */
+.message {
+  padding: var(--panel-pad) var(--pad-x);
+  color: var(--text-muted);
+}
+
+.message-button {
+  margin-top: var(--panel-pad);
+  height: var(--row-h);
+  padding: 0 var(--pad-x);
+  border: none;
+  border-radius: var(--radius);
+  background: var(--hover);
+  color: var(--text);
+  font: inherit;
+  cursor: default;
+}
+
+.message-button:hover {
+  background: var(--active);
+  box-shadow: var(--active-shadow);
+}
+
+/* Context menu target: the row stays highlighted while its menu is open. */
+.is-menu-target > .row {
+  background: var(--hover);
+}
+
+/* Inline rename / edit address: a field over the row, where the title starts. */
+.folder {
+  position: relative;
+}
+
+.field {
+  position: absolute;
+  top: calc((var(--row-h) - var(--field-h)) / 2);
+  left: calc(var(--field-left) - var(--field-pad-x) - var(--field-border));
+  right: calc(var(--pad-x) / 2);
+  height: var(--field-h);
+  padding: 0 var(--field-pad-x);
+  border: var(--field-border) solid var(--accent);
+  border-radius: calc(var(--radius) - 2px);
+  background: var(--field-bg);
+  color: var(--text);
+  font: inherit;
+  outline: none;
+  user-select: text;
+}
+
+.folder > .field {
+  font-weight: var(--fw-folder);
+}
+
+.field.is-invalid {
+  border-color: var(--danger);
+}
+
+.is-editing > .row .title,
+.is-editing > .row .chevron {
+  visibility: hidden;
+}
+
+.is-editing > :is(.row-actions, .pair-half) {
+  display: none;
+}
+
+/* While a collapsed folder shows its selected link under itself, the original row
+   inside the folder is hidden, so it isn't seen twice while the folder collapses. */
+.link.is-peek-source {
+  visibility: hidden;
+}
+
+.link.is-peek-source .action[data-action="sound"] {
+  visibility: hidden;
+}
+
+/* Context menu. */
+.menu {
+  position: fixed;
+  z-index: 10;
+  min-width: var(--menu-w);
+  max-width: calc(100vw - 2 * var(--panel-pad));
+  padding: var(--menu-pad);
+  border-radius: var(--menu-radius);
+  background: var(--surface);
+  box-shadow: var(--shadow);
+  outline: none;
+}
+
+.menu-item {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  height: var(--menu-row-h);
+  padding: 0 var(--pad-x);
+  border: none;
+  border-radius: calc(var(--menu-radius) - var(--menu-pad));
+  background: transparent;
+  color: var(--text);
+  font: inherit;
+  text-align: left;
+  white-space: nowrap;
+  cursor: default;
+}
+
+.menu-item:not(:disabled):is(:hover, :focus-visible) {
+  background: var(--hover);
+  outline: none;
+}
+
+.menu-item:disabled {
+  color: var(--text-muted);
+  opacity: .6;
+}
+
+.menu-separator {
+  height: var(--divider-w);
+  margin: var(--menu-pad) var(--pad-x);
+  background: var(--divider);
+}
+
+/* Confirm dialog. */
+.overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 20;
+  display: grid;
+  place-items: center;
+  padding: var(--panel-pad);
+  background: var(--overlay);
+}
+
+.dialog {
+  width: min(100%, var(--dialog-w));
+  padding: calc(2 * var(--pad-x));
+  border-radius: var(--menu-radius);
+  background: var(--surface);
+  box-shadow: var(--shadow);
+}
+
+.dialog-title {
+  font-weight: var(--fw-folder);
+  overflow-wrap: anywhere;
+}
+
+.dialog-text {
+  margin-top: var(--menu-pad);
+  color: var(--text-muted);
+}
+
+.dialog-buttons {
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--gap-x);
+  margin-top: calc(2 * var(--pad-x));
+}
+
+.dialog-button {
+  height: var(--menu-row-h);
+  padding: 0 calc(1.2 * var(--pad-x));
+  border: none;
+  border-radius: calc(var(--radius) - 2px);
+  background: var(--hover);
+  color: var(--text);
+  font: inherit;
+  cursor: default;
+}
+
+.dialog-button:hover {
+  filter: brightness(.96);
+}
+
+.dialog-button.is-danger {
+  background: var(--danger);
+  color: var(--danger-text);
+}
+
+.dialog-button.is-primary {
+  background: var(--accent);
+  color: var(--accent-text);
+}
+
+/* Arc import dialog (stage 7b). */
+.import-dialog {
+  width: min(100%, var(--import-w));
+  max-height: 100%;
+  overflow-y: auto;
+}
+
+.import-dialog .dialog-title + .import-check {
+  margin-top: var(--menu-pad);
+}
+
+/* A file from Finder over the import dialog. */
+.import-dialog.is-drop-file {
+  box-shadow: var(--shadow), inset 0 0 0 var(--field-border) var(--accent);
+}
+
+.import-path {
+  margin-top: var(--menu-pad);
+  padding: var(--menu-pad) var(--field-pad-x);
+  border-radius: calc(var(--radius) - 2px);
+  background: var(--hover);
+  font-family: var(--font-mono);
+  overflow-wrap: anywhere;
+  user-select: all;
+  cursor: text;
+}
+
+.dialog-error {
+  margin-top: var(--menu-pad);
+  color: var(--danger);
+}
+
+.import-check {
+  display: flex;
+  align-items: center;
+  gap: var(--gap-x);
+  min-height: var(--menu-row-h);
+}
+
+.import-check[hidden] {
+  display: none;
+}
+
+.import-check input {
+  margin: 0;
+  accent-color: var(--accent);
+}
+
+.import-check-text {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+.import-field {
+  display: flex;
+  flex-direction: column;
+  gap: var(--menu-pad);
+  margin-top: var(--pad-x);
+}
+
+.import-field[hidden] {
+  display: none;
+}
+
+.import-group {
+  margin-top: var(--pad-x);
+}
+
+.import-field-title {
+  color: var(--text-muted);
+}
+
+/* Arc's space with spaces on (stage 8b): ticked, and where it goes. */
+.import-space + .import-space {
+  margin-top: var(--menu-pad);
+}
+
+.import-select {
+  width: 100%;
+  height: var(--field-h);
+  font: inherit;
+  accent-color: var(--accent);
+}
+
+/* Helium's import from Arc: small text links under the hint (Arc's file by hand). */
+.dialog-links {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--menu-pad);
+  margin-top: var(--pad-x);
+}
+
+.dialog-link {
+  padding: 0;
+  border: none;
+  background: none;
+  color: var(--text-muted);
+  font: inherit;
+  text-align: left;
+  text-decoration: underline;
+  text-underline-offset: var(--link-offset);
+  cursor: pointer;
+}
+
+.dialog-link:hover {
+  color: var(--text);
+}
+
+/* Sorting what came from Arc: a space's name, its first links, where it goes. */
+.sort-space {
+  display: flex;
+  flex-direction: column;
+  gap: var(--menu-pad);
+  margin-top: calc(1.5 * var(--pad-x));
+}
+
+/* A folder's or a new space's icon in the import dialogs (stage 8g): opens the icon picker. */
+.sort-name {
+  display: flex;
+  align-items: center;
+  gap: var(--gap-x);
+}
+
+.sort-name .picker-field {
+  flex: 1;
+  min-width: 0;
+}
+
+.icon-button {
+  flex: none;
+  display: grid;
+  place-items: center;
+  width: var(--field-h);
+  height: var(--field-h);
+  padding: 0;
+  border: var(--field-border) solid var(--divider);
+  border-radius: calc(var(--radius) - 2px);
+  background: var(--field-bg);
+  color: var(--text-muted);
+  cursor: default;
+}
+
+.icon-button svg {
+  width: var(--icon);
+  height: var(--icon);
+}
+
+.icon-button:not(:disabled):hover,
+.icon-button.is-menu-target {
+  background: var(--hover);
+}
+
+.icon-button:disabled > * {
+  opacity: var(--space-dim);
+}
+
+.sort-preview {
+  color: var(--text-muted);
+  overflow-wrap: anywhere;
+}
+
+.sort-space .picker-field:disabled {
+  border-color: var(--hover);
+  color: var(--text-muted);
+}
+
+/* Toast "Deleted · Undo". */
+.toast {
+  position: fixed;
+  left: var(--panel-pad);
+  right: var(--panel-pad);
+  bottom: var(--panel-pad);
+  z-index: 15;
+  display: flex;
+  align-items: center;
+  gap: var(--gap-x);
+  height: var(--row-h);
+  padding: 0 var(--menu-pad) 0 calc(1.2 * var(--pad-x));
+  border-radius: var(--radius);
+  background: var(--toast-bg);
+  color: var(--toast-text);
+  box-shadow: var(--shadow);
+  animation: toast-in var(--dur) ease;
+}
+
+.toast-text {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  white-space: nowrap;
+}
+
+.toast-action {
+  height: calc(var(--row-h) - 2 * var(--menu-pad));
+  padding: 0 var(--pad-x);
+  border: none;
+  border-radius: calc(var(--radius) - 2px);
+  background: transparent;
+  color: var(--toast-action);
+  font: inherit;
+  font-weight: var(--fw-folder);
+  cursor: default;
+}
+
+.toast-action:hover {
+  background: color-mix(in srgb, var(--toast-text) 12%, transparent);
+}
+
+@keyframes toast-in {
+  from {
+    opacity: 0;
+    transform: translateY(var(--menu-pad));
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .toast {
+    animation: none;
+  }
+}
+
+/* Drag and drop. */
+.is-dragging {
+  opacity: var(--drag-opacity);
+}
+
+.drop-line {
+  position: absolute;
+  z-index: 2; /* over the favorites */
+  left: calc(var(--panel-pad) + var(--pad-x) + var(--line-depth, 0) * var(--indent));
+  right: var(--panel-pad);
+  height: var(--drop-line);
+  margin-top: calc(var(--drop-line) / -2);
+  border-radius: var(--drop-line);
+  background: var(--accent);
+  pointer-events: none;
+}
+
+/* Between tiles the line stands upright, in the gap. */
+.drop-line.is-vertical {
+  left: var(--line-x);
+  right: auto;
+  width: var(--drop-line);
+  height: var(--line-h);
+  margin-top: 0;
+  margin-left: calc(var(--drop-line) / -2);
+}
+
+.is-drop-inside > .folder-row,
+.is-drop-onto > .row {
+  background: var(--active);
+  box-shadow: inset 0 0 0 var(--field-border) var(--accent);
+}
+
+/* Folder icon picker: a menu card with a grid of emoji. */
+.picker {
+  z-index: 30; /* the import dialogs open it over themselves */
+  width: min(var(--picker-w), 100vw - 2 * var(--panel-pad));
+  min-width: 0;
+}
+
+.emoji-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, var(--emoji-cell));
+  justify-content: space-between;
+}
+
+.emoji-option {
+  display: grid;
+  place-items: center;
+  width: var(--emoji-cell);
+  height: var(--emoji-cell);
+  padding: 0;
+  border: none;
+  border-radius: calc(var(--menu-radius) - var(--menu-pad));
+  background: transparent;
+  font-size: var(--emoji-size);
+  line-height: 1;
+  cursor: default;
+}
+
+.emoji-option:is(:hover, :focus-visible) {
+  background: var(--hover);
+  outline: none;
+}
+
+.emoji-option[aria-pressed="true"] {
+  background: var(--active);
+  box-shadow: inset 0 0 0 var(--field-border) var(--accent);
+}
+
+/* "Icons" / "Emoji" over the grids (stage 8g); the pictograms scroll. */
+.picker-tabs {
+  display: flex;
+  gap: var(--menu-pad);
+  margin-bottom: var(--menu-pad);
+}
+
+.picker-tab {
+  flex: 1;
+  height: var(--menu-row-h);
+  padding: 0 var(--pad-x);
+  border: none;
+  border-radius: calc(var(--menu-radius) - var(--menu-pad));
+  background: transparent;
+  color: var(--text-muted);
+  font: inherit;
+  cursor: default;
+}
+
+.picker-tab:hover {
+  background: var(--hover);
+}
+
+.picker-tab[aria-selected="true"] {
+  background: var(--active);
+  color: var(--text);
+}
+
+.pictogram-grid {
+  max-height: min(var(--picker-grid-h), 50vh);
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  scrollbar-width: thin;
+}
+
+/* A theme's name over its pictograms. */
+.picker-section {
+  grid-column: 1 / -1;
+  padding: var(--menu-pad) var(--menu-pad) 0;
+  color: var(--text-muted);
+  font-size: var(--picker-section-fs);
+}
+
+.pictogram-option svg {
+  width: var(--pictogram-size);
+  height: var(--pictogram-size);
+}
+
+.emoji-grid[hidden],
+.dialog-text[hidden] {
+  display: none;
+}
+
+.picker-other {
+  padding: var(--menu-pad) var(--pad-x);
+}
+
+.picker-field {
+  width: 100%;
+  height: var(--field-h);
+  padding: 0 var(--field-pad-x);
+  border: var(--field-border) solid var(--accent);
+  border-radius: calc(var(--radius) - 2px);
+  background: var(--field-bg);
+  color: var(--text);
+  font: inherit;
+  outline: none;
+  user-select: text;
+}
+
+.picker-field.is-invalid {
+  border-color: var(--danger);
+}
+
+.picker-hint {
+  margin-top: var(--menu-pad);
+  color: var(--text-muted);
+}
+
+.picker [hidden] {
+  display: none;
+}
+
+/* Spaces (stage 8): their icons in a bar at the bottom. */
+.spaces {
+  position: relative; /* the drop line between icons is placed inside it */
+  flex: none;
+  display: flex;
+  align-items: center;
+  gap: var(--space-gap);
+  height: var(--spacebar-h);
+  padding: 0 var(--panel-pad);
+}
+
+.spaces[hidden] {
+  display: none;
+}
+
+.space-icons {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  gap: var(--space-gap);
+  overflow-x: auto;
+  scrollbar-width: none;
+  overscroll-behavior-x: none;
+}
+
+.space-icon,
+.space-add {
+  flex: none;
+  width: var(--space-icon);
+  height: var(--space-icon);
+  display: grid;
+  place-items: center;
+  padding: 0;
+  border: none;
+  border-radius: var(--radius);
+  background: transparent;
+  color: var(--text-muted);
+  font: inherit;
+  cursor: default;
+}
+
+.space-icon > * {
+  opacity: var(--space-dim);
+  filter: grayscale(1);
+  transition: opacity var(--dur) ease, filter var(--dur) ease;
+}
+
+.space-icon:hover,
+.space-add:hover,
+.space-icon.is-menu-target {
+  background: var(--hover);
+}
+
+.space-icon:hover > *,
+.space-icon.is-current > * {
+  opacity: 1;
+  filter: none;
+}
+
+.space-icon.is-current {
+  background: var(--active);
+}
+
+/* Dropping onto another space's icon. */
+.space-icon.is-drop-inside {
+  background: var(--active);
+  box-shadow: inset 0 0 0 var(--field-border) var(--accent);
+}
+
+.space-icon.is-drop-inside > * {
+  opacity: 1;
+  filter: none;
+}
+
+.space-icon .pictogram {
+  width: var(--icon);
+  height: var(--icon);
+}
+
+.space-letter {
+  font-size: var(--space-letter-fs);
+  font-weight: var(--fw-folder);
+  line-height: 1;
+}
+
+.space-add svg {
+  width: var(--icon);
+  height: var(--icon);
+}
+
+/* The swipe between spaces: the tree and the tabs below the divider follow the fingers
+   (--swipe-x is set by the panel), then the new space's content slides in. */
+.list {
+  overscroll-behavior-x: none;
+}
+
+.list > #tree,
+.list > .open-tabs {
+  transition: transform var(--dur) ease;
+}
+
+.list.is-swiping > #tree,
+.list.is-swiping > .open-tabs {
+  transform: translateX(var(--swipe-x));
+  transition: none;
+}
+
+.list.slide-next > #tree,
+.list.slide-next > .open-tabs {
+  animation: slide-from-right var(--dur) ease;
+}
+
+.list.slide-previous > #tree,
+.list.slide-previous > .open-tabs {
+  animation: slide-from-left var(--dur) ease;
+}
+
+@keyframes slide-from-right {
+  from { transform: translateX(var(--swipe-slide)); opacity: 0; }
+}
+
+@keyframes slide-from-left {
+  from { transform: translateX(calc(-1 * var(--swipe-slide))); opacity: 0; }
+}
+
+/* The toast stays above the bar. */
+body.has-spaces .toast {
+  bottom: calc(var(--spacebar-h) + var(--panel-pad));
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .space-icon > *,
+  .list > #tree,
+  .list > .open-tabs {
+    transition: none;
+  }
+}

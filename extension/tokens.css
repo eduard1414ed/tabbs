@@ -1,0 +1,155 @@
+/* Design tokens (docs/03-design.md), shared by the panel and the welcome page. All sizes and colors come from here. */
+:root {
+  color-scheme: light dark;
+
+  --row-h: 36px;
+  --pad-x: 10px;
+  --gap-x: 8px;
+  --indent: 20px;
+  --icon: 16px;
+  --radius: 8px;
+  --panel-pad: 8px;
+  --folder-gap: 8px;
+  --font: system-ui, -apple-system, "SF Pro Text", sans-serif;
+  --fs: 13px;
+  --fw-folder: 600;
+  --tile-h: 40px;
+  --tile-icon: 16px;
+  --tile-gap: 6px;
+  --tile-min-w: 56px;
+  --tile-action: 18px;
+  --tile-action-inset: 3px;
+  --dur: 160ms;
+  --fade: 24px;
+  --chevron: 12px;
+  --focus-ring: 2px;
+  --fallback-fs: 10px;
+  --action: 22px;
+  --action-icon: 12px;
+  --divider-w: 1px;
+  --loading-delay: 200ms;
+  --menu-w: 200px;
+  --menu-pad: 4px;
+  --menu-row-h: 28px;
+  --menu-radius: 10px;
+  --dialog-w: 280px;
+  --field-h: 26px;
+  --field-pad-x: 6px;
+  --field-border: 1px;
+  --drop-line: 2px;
+  --drag-opacity: .4;
+  --picker-w: 260px;
+  --emoji-cell: 28px;
+  --emoji-size: 18px;
+  --pictogram-size: 18px;
+  --picker-grid-h: 336px;
+  --picker-section-fs: 11px;
+  --icon-hover-pad: 3px;
+  --pair-gap: 12px;
+  --pair-divider: 1px;
+  --import-w: 320px;
+  --spacebar-h: 40px;
+  --space-icon: 28px;
+  --space-gap: 4px;
+  --space-dim: .45;
+  --space-letter-fs: 13px;
+  --swipe-slide: 24px;
+  --page-w: 624px;
+  --page-pad: 48px;
+  --page-pad-top: 96px;
+  --page-gap: 48px;
+  --page-fs: 18px;
+  --page-small-fs: 15px;
+  --page-title-fs: 60px;
+  --page-heading-fs: 24px;
+  --path-fs: 15px;
+  --step-mark: 26px;
+  --step-mark-fs: 12px;
+  --step-indent: 44px;
+  --step-gap: 14px;
+  --page-button-fs: 16px;
+  --page-nav-w: 248px;
+  --page-nav-pad: 12px;
+  --page-nav-row-h: 36px;
+  --page-nav-gap: 2px;
+  --page-nav-fs: 15px;
+  --page-nav-icon: 16px;
+  --page-nav-radius: 10px;
+  --page-nav-count-fs: 13px;
+  --page-nav-top: 20px;
+  --link-offset: 3px;
+  --font-mono: ui-monospace, "SF Mono", Menlo, monospace;
+
+  --bg: #f9f9ff;
+  --text: #1d1d1f;
+  --text-muted: #6e6e73;
+  --hover: rgba(0, 0, 0, .05);
+  --active: rgba(59, 130, 246, .13);
+  --active-shadow: none;
+  --divider: rgba(0, 0, 0, .08);
+  --accent: #3b82f6;
+  --accent-text: #ffffff;
+  --fallback-s: 55%;
+  --fallback-l: 50%;
+  --fallback-text: #ffffff;
+  --surface: #ffffff;
+  --shadow: 0 0 0 1px rgba(0, 0, 0, .06), 0 8px 24px rgba(0, 0, 0, .14);
+  --overlay: rgba(0, 0, 0, .12);
+  --danger: #e5484d;
+  --danger-text: #ffffff;
+  --toast-bg: #1d1d1f;
+  --toast-text: #f5f5f7;
+  --toast-action: #8ab4ff;
+  --field-bg: #ffffff;
+  --tile-bg: rgba(0, 0, 0, .04);
+  --tile-hover: rgba(0, 0, 0, .07);
+  --success: #30a46c;
+  /* The welcome page is always white with a faint grain, whatever the system theme (Ed's choice). */
+  --page-bg: #fdfdfc;
+  --page-grain: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='g'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 .09 -.03'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23g)'/%3E%3C/svg%3E");
+  --page-text: #2e2f30;
+  --page-muted: #77797a;
+  --page-line: #9a9c9c;
+  --page-link-line: rgba(46, 47, 48, .35);
+  --page-success: #30a46c;
+  --page-accent: #3b82f6;
+  --page-nav-hover: rgba(0, 0, 0, .04);
+  --page-nav-active: #ffffff;
+  --page-nav-shadow: 0 1px 3px rgba(0, 0, 0, .12), 0 0 0 .5px rgba(0, 0, 0, .08);
+}
+
+/* The welcome page on a narrow window */
+@media (max-width: 760px) {
+  :root {
+    --page-pad: 16px;
+    --page-pad-top: 48px;
+    --page-gap: 40px;
+    --page-fs: 16px;
+    --page-title-fs: 40px;
+  }
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #1f1f1f;
+    --text: #e8e8e8;
+    --text-muted: #9a9a9a;
+    --hover: rgba(255, 255, 255, .06);
+    --active: rgba(96, 165, 250, .16);
+    --active-shadow: none;
+    --divider: rgba(255, 255, 255, .08);
+    --accent: #60a5fa;
+    --fallback-l: 42%;
+    --surface: #2b2b2b;
+    --shadow: 0 0 0 1px rgba(255, 255, 255, .08), 0 8px 24px rgba(0, 0, 0, .45);
+    --overlay: rgba(0, 0, 0, .35);
+    --danger: #ff6369;
+    --toast-bg: #e8e8e8;
+    --toast-text: #1d1d1f;
+    --toast-action: #2563eb;
+    --field-bg: #151515;
+    --tile-bg: rgba(255, 255, 255, .06);
+    --tile-hover: rgba(255, 255, 255, .1);
+    --success: #3dd68c;
+  }
+}

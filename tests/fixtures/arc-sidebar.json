@@ -1,0 +1,65 @@
+{
+  "version": 1,
+  "sidebarSyncState": {},
+  "firebaseSyncState": {},
+  "sidebar": {
+    "containers": [
+      { "global": {} },
+      {
+        "topAppsContainerIDs": [{ "default": true }, "FAV"],
+        "spaces": [
+          "S1",
+          {
+            "id": "S1",
+            "title": "Home",
+            "profile": { "default": true },
+            "customInfo": { "iconType": { "emoji_v2": "🏡" } },
+            "newContainerIDs": [],
+            "containerIDs": ["unpinned", "S1-U", "pinned", "S1-P"]
+          },
+          "S2",
+          {
+            "id": "S2",
+            "title": "Hobby",
+            "profile": { "default": true },
+            "customInfo": { "iconType": { "icon": "gamecontroller" } },
+            "newContainerIDs": [],
+            "containerIDs": ["unpinned", "S2-U", "pinned", "S2-P"]
+          }
+        ],
+        "items": [
+          "FAV",
+          { "id": "FAV", "title": null, "parentID": null, "childrenIds": ["f1", "f2"], "data": { "itemContainer": { "containerType": { "topApps": { "_0": { "default": true } } } } } },
+          "f1",
+          { "id": "f1", "title": null, "parentID": "FAV", "childrenIds": [], "data": { "tab": { "savedURL": "https://calendar.example.com/week", "savedTitle": "Calendar - Week 42" } } },
+          "f2",
+          { "id": "f2", "title": null, "parentID": "FAV", "childrenIds": [], "data": { "tab": { "savedURL": "https://video.example.com/", "savedTitle": "" } } },
+          "S1-P",
+          { "id": "S1-P", "title": null, "parentID": null, "childrenIds": ["a", "F", "gone", "x", "b"], "data": { "itemContainer": { "containerType": { "spaceItems": { "_0": "S1" } } } } },
+          "a",
+          { "id": "a", "title": "Disk", "parentID": "S1-P", "childrenIds": [], "data": { "tab": { "savedURL": "https://disk.example.com/my", "savedTitle": "My files – Disk" } } },
+          "F",
+          { "id": "F", "title": "Podcast", "parentID": "S1-P", "childrenIds": ["G", "c"], "data": { "list": {} } },
+          "G",
+          { "id": "G", "title": "Site", "parentID": "F", "childrenIds": ["d"], "data": { "list": {} } },
+          "d",
+          { "id": "d", "title": null, "parentID": "G", "childrenIds": [], "data": { "tab": { "savedURL": "https://podcast.example.com/admin?a=1&b=2", "savedTitle": "Robots — Podcast <admin>" } } },
+          "c",
+          { "id": "c", "title": "  Social \"page\"  ", "parentID": "F", "childrenIds": [], "data": { "tab": { "savedURL": "https://social.example.com/podcast", "savedTitle": "Podcast | Social" } } },
+          "x",
+          { "id": "x", "title": null, "parentID": "S1-P", "childrenIds": [], "data": { "splitView": {} } },
+          "b",
+          { "id": "b", "title": "Notes & ideas", "parentID": "S1-P", "childrenIds": [], "data": { "tab": { "savedURL": "https://notes.example.com/", "savedTitle": "Notes" } } },
+          "S1-U",
+          { "id": "S1-U", "title": null, "parentID": null, "childrenIds": ["t"], "data": { "itemContainer": { "containerType": { "spaceItems": { "_0": "S1" } } } } },
+          "t",
+          { "id": "t", "title": null, "parentID": "S1-U", "childrenIds": [], "data": { "tab": { "savedURL": "https://today.example.com/", "savedTitle": "A tab of today" } } },
+          "S2-P",
+          { "id": "S2-P", "title": null, "parentID": null, "childrenIds": ["h"], "data": { "itemContainer": { "containerType": { "spaceItems": { "_0": "S2" } } } } },
+          "h",
+          { "id": "h", "title": "Board", "parentID": "S2-P", "childrenIds": [], "data": { "tab": { "savedURL": "https://board.example.com/", "savedTitle": "Board - Whiteboard" } } }
+        ]
+      }
+    ]
+  }
+}

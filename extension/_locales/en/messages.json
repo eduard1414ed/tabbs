@@ -1,0 +1,14 @@
+{
+  "extDescription": {
+    "message": "Adds a convenient side panel with favorites, folders and spaces.",
+    "description": "Extension description in the extensions list and the store."
+  },
+  "nextSpace": {
+    "message": "Next space",
+    "description": "Command in the extension keyboard shortcuts (spaces): switch to the next space."
+  },
+  "previousSpace": {
+    "message": "Previous space",
+    "description": "Command in the extension keyboard shortcuts (spaces): switch to the previous space."
+  }
+}

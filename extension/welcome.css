@@ -1,0 +1,305 @@
+/* The welcome page (stage 7b): one column of text on white with a faint grain, the chapters on
+   the left as tabs in Arc's sidebar (stage 8b). Always light. Design tokens are in tokens.css. */
+
+* {
+  box-sizing: border-box;
+}
+
+:root {
+  color-scheme: light;
+}
+
+body {
+  margin: 0;
+  background: var(--page-bg);
+  color: var(--page-text);
+  font-family: var(--font);
+  font-size: var(--page-fs);
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* A faint grain over the white, behind everything. */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  background-image: var(--page-grain);
+  pointer-events: none;
+}
+
+/* The chapters: a column like Arc's sidebar, rows like its tabs. */
+.chapters {
+  position: fixed;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  width: var(--page-nav-w);
+  display: flex;
+  flex-direction: column;
+  gap: var(--page-nav-gap);
+  padding: var(--page-nav-top) var(--page-nav-pad);
+  overflow-y: auto;
+}
+
+.chapters-brand {
+  display: flex;
+  align-items: center;
+  gap: var(--gap-x);
+  height: var(--page-nav-row-h);
+  margin-bottom: var(--gap-x);
+  padding: 0 var(--gap-x);
+  font-size: var(--page-nav-fs);
+  font-weight: var(--fw-folder);
+}
+
+.chapters-logo {
+  width: var(--page-nav-icon);
+  height: var(--page-nav-icon);
+}
+
+.chapter {
+  display: flex;
+  align-items: center;
+  gap: var(--gap-x);
+  height: var(--page-nav-row-h);
+  padding: 0 var(--gap-x);
+  border: none;
+  border-radius: var(--page-nav-radius);
+  background: transparent;
+  color: var(--page-text);
+  font: inherit;
+  font-size: var(--page-nav-fs);
+  text-align: left;
+  cursor: pointer;
+}
+
+.chapter:hover {
+  background: var(--page-nav-hover);
+}
+
+.chapter.is-current {
+  background: var(--page-nav-active);
+  box-shadow: var(--page-nav-shadow);
+}
+
+.chapter:focus-visible {
+  outline: var(--focus-ring) solid var(--page-accent);
+  outline-offset: calc(-1 * var(--focus-ring));
+}
+
+.chapter-icon {
+  width: var(--page-nav-icon);
+  font-size: var(--page-nav-icon);
+  line-height: 1;
+  text-align: center;
+}
+
+.chapter-title {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.chapter-count {
+  color: var(--page-muted);
+  font-size: var(--page-nav-count-fs);
+  font-variant-numeric: tabular-nums;
+}
+
+.chapter-count.is-done {
+  color: var(--page-success);
+  font-weight: var(--fw-folder);
+}
+
+.page {
+  max-width: calc(var(--page-w) + 2 * var(--page-pad));
+  margin: 0 auto;
+  margin-left: max(var(--page-nav-w), (100vw - var(--page-w)) / 2 - var(--page-pad));
+  padding: var(--page-pad-top) var(--page-pad) var(--page-pad-top);
+}
+
+.section + .section {
+  margin-top: var(--page-gap);
+}
+
+/* A chapter scrolled to: its heading not right at the edge. */
+.section {
+  scroll-margin-top: var(--page-pad-top);
+}
+
+.title {
+  margin: 0;
+  font-size: var(--page-title-fs);
+  font-weight: 300;
+  line-height: 1.1;
+  letter-spacing: -.01em;
+  word-break: keep-all; /* the extension's name stays in one piece */
+}
+
+
+.heading {
+  margin: 0 0 calc(2 * var(--gap-x));
+  font-size: var(--page-heading-fs);
+  font-weight: 400;
+  line-height: 1.3;
+}
+
+.text {
+  margin: 0 0 calc(2 * var(--gap-x));
+}
+
+.text:last-child {
+  margin-bottom: 0;
+}
+
+.text.intro {
+  margin-top: calc(2.5 * var(--gap-x));
+}
+
+.text.is-muted {
+  color: var(--page-muted);
+  font-size: var(--page-small-fs);
+}
+
+.text strong {
+  font-weight: var(--fw-folder);
+}
+
+.link {
+  color: inherit;
+  text-decoration: underline;
+  text-decoration-color: var(--page-link-line);
+  text-decoration-thickness: var(--divider-w);
+  text-underline-offset: var(--link-offset);
+  cursor: pointer;
+}
+
+.link:hover {
+  text-decoration-color: currentColor;
+}
+
+.link:focus-visible,
+.mark:focus-visible,
+.button:focus-visible {
+  outline: var(--focus-ring) solid var(--page-accent);
+  outline-offset: var(--focus-ring);
+}
+
+.path {
+  display: inline-block;
+  margin: 0 0 calc(2 * var(--gap-x));
+  border-bottom: var(--divider-w) dashed var(--page-line);
+  font-family: var(--font-mono);
+  font-size: var(--path-fs);
+  user-select: all;
+}
+
+/* Steps: the round mark ticks a step; the last line lights up when all are ticked. */
+.steps {
+  margin: calc(3 * var(--gap-x)) 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.step {
+  position: relative;
+  padding-left: var(--step-indent);
+}
+
+.step + .step {
+  margin-top: var(--step-gap);
+}
+
+.mark {
+  position: absolute;
+  top: 0;
+  left: 0;
+  display: grid;
+  place-items: center;
+  width: var(--step-mark);
+  height: var(--step-mark);
+  padding: 0;
+  border: var(--divider-w) solid var(--page-line);
+  border-radius: 50%;
+  background: none;
+  color: var(--page-muted);
+  font: inherit;
+  font-size: var(--step-mark-fs);
+  font-variant-numeric: tabular-nums;
+  cursor: pointer;
+}
+
+.mark:hover {
+  border-color: var(--page-text);
+  color: var(--page-text);
+}
+
+.mark:disabled {
+  cursor: default;
+}
+
+.step.is-done {
+  color: var(--page-muted);
+}
+
+.step.is-done .mark,
+.step.is-final.is-done .mark {
+  border-color: var(--page-success);
+  background: var(--page-success);
+  color: var(--page-bg);
+}
+
+.step.is-final {
+  color: var(--page-line);
+}
+
+.step.is-final .mark {
+  border-style: dashed;
+  color: var(--page-line);
+  cursor: default;
+}
+
+.step.is-final.is-done {
+  color: var(--page-success);
+  font-weight: 500;
+}
+
+.step.is-final.is-done .mark {
+  border-style: solid;
+}
+
+.button {
+  padding: calc(1.5 * var(--gap-x)) calc(2.75 * var(--gap-x));
+  border: none;
+  border-radius: var(--radius);
+  background: var(--page-text);
+  color: var(--page-bg);
+  font: inherit;
+  font-size: var(--page-button-fs);
+  font-weight: 500;
+  cursor: pointer;
+}
+
+.button:hover {
+  opacity: .88;
+}
+
+/* "Spaces are on." and the keys for them under it. */
+.section > .step.is-final + .text {
+  margin-top: var(--step-gap);
+}
+
+/* A narrow window: the text only, as before. */
+@media (max-width: 860px) {
+  .chapters {
+    display: none;
+  }
+
+  .page {
+    margin-left: auto;
+  }
+}
