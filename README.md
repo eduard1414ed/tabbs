@@ -43,6 +43,8 @@ The extension can’t hide the browser’s own tab list, but Helium’s settings
 
 Also handy: **Enable quick page link copying with ⌘+Shift+C** (Behavior section) copies the page address.
 
+Using a color theme in Helium? Click the eyedropper at the bottom of the panel, then click the panel’s header — the panel takes the same color. The dark theme switches by itself. To go back to the usual colors, right-click the eyedropper → **Reset color**.
+
 In Chrome, Brave or Edge the extension works too, but their own tab strip stays visible.
 
 ## Move from Arc

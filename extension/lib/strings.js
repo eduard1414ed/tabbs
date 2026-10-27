@@ -35,6 +35,13 @@ const en = (app) => ({
   newTab: 'New tab',
   favoritesDrop: 'Drop here to add to Favorites',
 
+  // The eyedropper at the bottom of the panel (stage 9).
+  panelColor: {
+    pick: 'Panel color',
+    hint: 'Click the panel’s header',
+    reset: 'Reset color',
+  },
+
   menu: {
     rename: 'Rename',
     'change-icon': 'Change icon',
@@ -156,6 +163,8 @@ const en = (app) => ({
     stepShortcut: (key) => `${app} now opens with **${key}** ([change](shortcuts)), so you can hide the puzzle icon if you like: [Customize your toolbar](toolbar) → **Toolbar** → turn off **Extensions**. Your extensions stay in the menu bar: Window → Extensions.`,
     stepNoShortcut: `Choose a [shortcut](shortcuts) for ${app}, then you can hide the puzzle icon if you like: [Customize your toolbar](toolbar) → **Toolbar** → turn off **Extensions**. Your extensions stay in the menu bar: Window → Extensions.`,
     stepsDone: 'Done. Nice work!',
+    // Under the steps (stage 9): the eyedropper at the bottom of the panel.
+    themeColor: 'Using a color theme in Helium? Click the eyedropper at the bottom of the panel, then click the panel’s header — the panel takes the same color. The dark theme switches by itself.',
     markDone: 'Mark as done',
     markNotDone: 'Mark as not done',
     spacesTitle: 'Spaces',
@@ -260,6 +269,12 @@ const ru = (app) => ({
   unmute: 'Включить звук',
   newTab: 'Новая вкладка',
   favoritesDrop: 'Перетащите сюда — в Избранное',
+
+  panelColor: {
+    pick: 'Цвет панели',
+    hint: 'Кликните по заголовку панели',
+    reset: 'Сбросить цвет',
+  },
 
   menu: {
     rename: 'Переименовать',
@@ -377,6 +392,7 @@ const ru = (app) => ({
     stepShortcut: (key) => `${app} теперь открывается клавишами **${key}** ([изменить](shortcuts)), так что значок пазла можно спрятать: [«Настройка панели инструментов»](toolbar) → **«Панель инструментов»** → выключите **«Расширения»**. Сами расширения останутся в меню: «Окно» → «Расширения».`,
     stepNoShortcut: `Назначьте ${app} [клавиши](shortcuts), и значок пазла можно будет спрятать: [«Настройка панели инструментов»](toolbar) → **«Панель инструментов»** → выключите **«Расширения»**. Сами расширения останутся в меню: «Окно» → «Расширения».`,
     stepsDone: 'Готово, отличная работа!',
+    themeColor: 'Цветная тема в Helium? Нажмите пипетку внизу панели и кликните по заголовку панели — панель возьмёт тот же цвет. Тёмная тема переключается сама.',
     markDone: 'Отметить как сделанное',
     markNotDone: 'Снять отметку',
     spacesTitle: 'Пространства',

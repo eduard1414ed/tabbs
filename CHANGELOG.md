@@ -1,5 +1,10 @@
 # Changelog
 
+## 1.3.0 — 2026-10-27
+
+- The panel can take the color of Helium’s theme: click the eyedropper at the bottom of the panel, then the panel’s header. Text stays readable on any color. Light and dark themes keep a color each; right-click the eyedropper to reset it.
+- The dark theme matches Helium’s dark colors; weak contrasts are fixed.
+
 ## 1.2.0 — 2026-10-27
 
 The first version in the Chrome Web Store.

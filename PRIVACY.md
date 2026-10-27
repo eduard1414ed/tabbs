@@ -7,7 +7,7 @@ Tabbs does not collect, sell or send any data. It makes no network requests, has
 ## What the extension stores, and where
 
 - **Your folders and links** are ordinary browser bookmarks in the folder “Tabbs” inside “Other bookmarks”. If you have bookmark sync turned on, your browser syncs them like any other bookmarks; the extension itself sends nothing.
-- **Small settings** in the browser’s local extension storage: the id of that folder, which folders are expanded, which pictogram a folder or space has, which folders are spaces, which setup steps you ticked on the welcome page, and whether the browser was last in the light or the dark theme (to pick the toolbar icon). While you sort an import from Arc, also which bookmarks it brought.
+- **Small settings** in the browser’s local extension storage: the id of that folder, which folders are expanded, which pictogram a folder or space has, which folders are spaces, which setup steps you ticked on the welcome page, the panel color you picked with the eyedropper (one for the light theme, one for the dark), and whether the browser was last in the light or the dark theme (to pick the toolbar icon). While you sort an import from Arc, also which bookmarks it brought.
 - **Which tab belongs to which link**, and which space is open in each window, in session storage that the browser clears when it quits.
 - **Arc’s sidebar file**, if you choose it for the import, is read in the browser and not kept: only the bookmarks made from it stay.
 
@@ -37,7 +37,7 @@ Tabbs не собирает, не продаёт и никуда не отпра
 ## Что расширение хранит и где
 
 - **Папки и ссылки** — обычные закладки браузера в папке «Tabbs» внутри «Других закладок». Если в браузере включена синхронизация закладок, браузер синхронизирует их, как любые другие; само расширение ничего не отправляет.
-- **Мелкие настройки** — в локальном хранилище расширения: id этой папки, какие папки раскрыты, какие пиктограммы у папок и пространств, какие папки стали пространствами, какие шаги настройки отмечены на странице приветствия и какая тема была у браузера в последний раз — светлая или тёмная (чтобы выбрать значок кнопки на панели инструментов). Пока вы раскладываете импорт из Arc — ещё и какие закладки он принёс.
+- **Мелкие настройки** — в локальном хранилище расширения: id этой папки, какие папки раскрыты, какие пиктограммы у папок и пространств, какие папки стали пространствами, какие шаги настройки отмечены на странице приветствия, цвет панели, выбранный пипеткой (для светлой и для тёмной темы), и какая тема была у браузера в последний раз — светлая или тёмная (чтобы выбрать значок кнопки на панели инструментов). Пока вы раскладываете импорт из Arc — ещё и какие закладки он принёс.
 - **Какая вкладка принадлежит какой ссылке** и какое пространство открыто в каждом окне — в хранилище сеанса, которое браузер очищает при выходе.
 - **Файл боковой панели Arc**, если выбрать его для импорта, читается в браузере и не сохраняется: остаются только сделанные из него закладки.
 

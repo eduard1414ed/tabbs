@@ -267,7 +267,8 @@ function render() {
   finalStep = el('li', 'step is-final');
   finalStep.append(el('span', 'mark', '✓'), el('span', '', W.stepsDone));
   list.append(finalStep);
-  const setup = section(el('h2', 'heading', W.setupTitle), el('p', 'text', W.setupIntro), list);
+  // Under the steps: a color theme in Helium and the eyedropper (stage 9).
+  const setup = section(el('h2', 'heading', W.setupTitle), el('p', 'text', W.setupIntro), list, el('p', 'text', W.themeColor));
 
   const spacesButton = el('button', 'button', W.spacesButton);
   spacesButton.type = 'button';

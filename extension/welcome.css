@@ -214,6 +214,11 @@ body::before {
   margin-top: var(--step-gap);
 }
 
+/* The line about the eyedropper under the steps (stage 9): as much air as above them. */
+.steps + .text {
+  margin-top: calc(3 * var(--gap-x));
+}
+
 .mark {
   position: absolute;
   top: 0;

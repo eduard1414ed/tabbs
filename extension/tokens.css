@@ -53,6 +53,7 @@
   --space-gap: 4px;
   --space-dim: .45;
   --space-letter-fs: 13px;
+  --eyedropper-icon: 13px;
   --swipe-slide: 24px;
   --page-w: 624px;
   --page-pad: 48px;
@@ -80,30 +81,33 @@
   --link-offset: 3px;
   --font-mono: ui-monospace, "SF Mono", Menlo, monospace;
 
-  --bg: #f9f9ff;
-  --text: #1d1d1f;
-  --text-muted: #6e6e73;
-  --hover: rgba(0, 0, 0, .05);
-  --active: rgba(59, 130, 246, .13);
+  /* Colors: light-dark(light theme, dark theme). They follow `color-scheme` — Helium's theme,
+     or the scheme of the panel's own color (stage 9, lib/panel-color.js). */
+  --bg: light-dark(#f9f9ff, #1e2020);
+  --text: light-dark(#1d1d1f, #e3e2e2);
+  --text-muted: light-dark(#6e6e73, #a0a0a0);
+  --hover: light-dark(rgba(0, 0, 0, .05), rgba(255, 255, 255, .06));
+  --active: light-dark(rgba(59, 130, 246, .13), rgba(96, 165, 250, .16));
   --active-shadow: none;
-  --divider: rgba(0, 0, 0, .08);
-  --accent: #3b82f6;
-  --accent-text: #ffffff;
+  --divider: light-dark(rgba(0, 0, 0, .08), rgba(255, 255, 255, .08));
+  --accent: light-dark(#3b82f6, #60a5fa);
+  /* Light blue and red buttons take dark text in the dark theme: white on them is hard to read. */
+  --accent-text: light-dark(#ffffff, #0b1d3a);
   --fallback-s: 55%;
   --fallback-l: 50%;
   --fallback-text: #ffffff;
-  --surface: #ffffff;
-  --shadow: 0 0 0 1px rgba(0, 0, 0, .06), 0 8px 24px rgba(0, 0, 0, .14);
-  --overlay: rgba(0, 0, 0, .12);
-  --danger: #e5484d;
-  --danger-text: #ffffff;
-  --toast-bg: #1d1d1f;
-  --toast-text: #f5f5f7;
-  --toast-action: #8ab4ff;
-  --field-bg: #ffffff;
-  --tile-bg: rgba(0, 0, 0, .04);
-  --tile-hover: rgba(0, 0, 0, .07);
-  --success: #30a46c;
+  --surface: light-dark(#ffffff, #2b2d2d);
+  --shadow: 0 0 0 1px light-dark(rgba(0, 0, 0, .06), rgba(255, 255, 255, .08)), 0 8px 24px light-dark(rgba(0, 0, 0, .14), rgba(0, 0, 0, .45));
+  --overlay: light-dark(rgba(0, 0, 0, .12), rgba(0, 0, 0, .35));
+  --danger: light-dark(#e5484d, #ff6369);
+  --danger-text: light-dark(#ffffff, #1d1d1f);
+  --toast-bg: light-dark(#1d1d1f, #e3e2e2);
+  --toast-text: light-dark(#f5f5f7, #1d1d1f);
+  --toast-action: light-dark(#8ab4ff, #1d4ed8);
+  --field-bg: light-dark(#ffffff, #151717);
+  --tile-bg: light-dark(rgba(0, 0, 0, .04), rgba(255, 255, 255, .06));
+  --tile-hover: light-dark(rgba(0, 0, 0, .07), rgba(255, 255, 255, .1));
+  --success: light-dark(#30a46c, #3dd68c);
   /* The welcome page is always white with a faint grain, whatever the system theme (Ed's choice). */
   --page-bg: #fdfdfc;
   --page-grain: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='g'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 .09 -.03'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23g)'/%3E%3C/svg%3E");
@@ -129,27 +133,9 @@
   }
 }
 
+/* Not a color, so not light-dark(): the fallback site icon's circle is a little darker in the dark theme. */
 @media (prefers-color-scheme: dark) {
   :root {
-    --bg: #1f1f1f;
-    --text: #e8e8e8;
-    --text-muted: #9a9a9a;
-    --hover: rgba(255, 255, 255, .06);
-    --active: rgba(96, 165, 250, .16);
-    --active-shadow: none;
-    --divider: rgba(255, 255, 255, .08);
-    --accent: #60a5fa;
     --fallback-l: 42%;
-    --surface: #2b2b2b;
-    --shadow: 0 0 0 1px rgba(255, 255, 255, .08), 0 8px 24px rgba(0, 0, 0, .45);
-    --overlay: rgba(0, 0, 0, .35);
-    --danger: #ff6369;
-    --toast-bg: #e8e8e8;
-    --toast-text: #1d1d1f;
-    --toast-action: #2563eb;
-    --field-bg: #151515;
-    --tile-bg: rgba(255, 255, 255, .06);
-    --tile-hover: rgba(255, 255, 255, .1);
-    --success: #3dd68c;
   }
 }

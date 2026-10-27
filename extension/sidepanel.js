@@ -40,6 +40,8 @@ import {
   stalePictograms,
 } from './lib/folder-icons.js';
 import { PICTOGRAMS } from './lib/pictograms.js';
+import { PANEL_COLOR_KEY, panelPalette, parsePanelColors, colorFor, withColor, isOwnColor, parseHex, parseRgb, toHex, over } from './lib/panel-color.js';
+import { themeOf } from './lib/action-icon.js';
 import {
   resolveSpaces,
   spaceIcon,
@@ -140,6 +142,9 @@ import {
   getLocalItems,
   setLocalItems,
   removeLocalKeys,
+  getPanelColors,
+  setPanelColors,
+  panelSide,
 } from './lib/browser.js';
 
 const RELOAD_DELAY_MS = 50;
@@ -936,7 +941,6 @@ spaceAddEl.type = 'button';
 spaceAddEl.title = S.spaces.newSpace;
 spaceAddEl.setAttribute('aria-label', S.spaces.newSpace);
 spaceAddEl.append(plusIcon());
-spacesEl.setAttribute('aria-label', S.spaces.bar);
 spacesEl.append(spaceIconsEl, spaceAddEl);
 
 // A space's bookmark title from the dialog: an emoji typed at the start of the name wins
@@ -957,8 +961,13 @@ function spaceIconNode(space, current = false) {
 // `space` null — spaces are off.
 function renderSpaces(space) {
   const on = Boolean(space);
-  spacesEl.hidden = !on;
-  document.body.classList.toggle('has-spaces', on);
+  spaceAddEl.hidden = !on;
+  // With spaces off the bar stays for the eyedropper (stage 9), if the browser has one.
+  const bar = on || canPickColor;
+  spacesEl.hidden = !bar;
+  if (on) spacesEl.setAttribute('aria-label', S.spaces.bar);
+  else spacesEl.removeAttribute('aria-label');
+  document.body.classList.toggle('has-bar', bar);
   if (!on) {
     spaceIconsEl.replaceChildren();
     return;
@@ -1451,7 +1460,146 @@ spacesEl.addEventListener('click', (event) => {
   const icon = event.target.closest('.space-icon');
   if (icon) switchSpace(icon.dataset.spaceId);
   else if (event.target.closest('.space-add')) newSpace();
+  else if (event.target.closest('.eyedropper')) pickPanelColor();
 });
+
+// ---------- The panel's color (stage 9)
+//
+// The eyedropper at the right end of the bar, there with spaces off too: the browser's own
+// EyeDropper picks the color of Helium's panel header, lib/panel-color.js works out the
+// other colors from it. A color per theme (storage.local), applied on every theme switch
+// and in every window; right click — "Reset color" for the current theme.
+
+// Phosphor Icons (MIT), "eyedropper", bold: as thick as the "+" next to it.
+const EYEDROPPER = 'M228,67.24a39.77,39.77,0,0,0-12.51-28.52C199.91,24,174.71,24.5,159.29,39.93L142.48,56.84a28,28,0,0,0-35.64,3.29l-9,9a20,20,0,0,0-.73,27.49L48.9,144.84A43.76,43.76,0,0,0,37,185.28l-7.5,17.19a17.66,17.66,0,0,0,3.71,19.65,19.9,19.9,0,0,0,22.15,4.19l16.31-7.13a43.88,43.88,0,0,0,39.45-12.09l48.24-48.26a20,20,0,0,0,27.47-.73l9-9a28.06,28.06,0,0,0,3.26-35.72l17.23-17.33A39.69,39.69,0,0,0,228,67.24ZM94.15,190.11a20,20,0,0,1-20,5,11.93,11.93,0,0,0-8.32.47L57,199.38,60.69,191a12,12,0,0,0,.37-8.64,19.92,19.92,0,0,1,4.81-20.55l48.2-48.22,28.28,28.3Zm105.14-111-25.37,25.52a12,12,0,0,0,0,16.95l4.88,4.89a4,4,0,0,1,0,5.66l-6.14,6.15-55-55.05,6.14-6.14a4,4,0,0,1,5.65,0L134.35,82a12,12,0,0,0,8.49,3.51h0A12,12,0,0,0,151.34,82l24.94-25.08c6.3-6.3,16.48-6.63,22.71-.74a16,16,0,0,1,.3,23Z';
+
+const canPickColor = 'EyeDropper' in window;
+const darkTheme = matchMedia('(prefers-color-scheme: dark)');
+
+const eyedropperEl = el('button', 'eyedropper');
+eyedropperEl.type = 'button';
+eyedropperEl.title = S.panelColor.pick;
+eyedropperEl.setAttribute('aria-label', S.panelColor.pick);
+eyedropperEl.hidden = !canPickColor;
+{
+  const svg = document.createElementNS(SVG_NS, 'svg');
+  svg.setAttribute('viewBox', '0 0 256 256');
+  svg.setAttribute('aria-hidden', 'true');
+  const path = document.createElementNS(SVG_NS, 'path');
+  path.setAttribute('d', EYEDROPPER);
+  path.setAttribute('fill', 'currentColor');
+  svg.append(path);
+  eyedropperEl.append(svg);
+}
+// Shown next to the eyedropper while it is open: where to click.
+const eyedropperHint = el('div', 'eyedropper-hint', S.panelColor.hint);
+eyedropperHint.setAttribute('role', 'status');
+eyedropperHint.hidden = true;
+spacesEl.append(eyedropperEl, eyedropperHint);
+// With the panel on the left, the eyedropper comes before "+" (Ed's choice).
+panelSide().then((side) => {
+  if (side === 'left') spacesEl.insertBefore(eyedropperEl, spaceAddEl);
+});
+
+let panelColors = {}; // { light?, dark? } — lib/panel-color.js
+let paletteTokens = []; // the CSS variables set by the current color, to take them off
+let picking = null; // AbortController while the eyedropper is open
+
+const currentTheme = () => themeOf(darkTheme.matches);
+
+// A token's value as the page sees it now, [r, g, b] (tokens.css colors are light-dark()).
+function tokenColor(name) {
+  const probe = el('span');
+  probe.style.color = `var(${name})`;
+  document.body.append(probe);
+  const color = parseRgb(getComputedStyle(probe).color)?.rgb;
+  probe.remove();
+  return color;
+}
+
+// The current theme's color on the page, or the usual colors of tokens.css. `color-scheme`
+// follows the color: a light color in the dark theme takes the light menus and toast.
+function applyPanelColor() {
+  const root = document.documentElement;
+  for (const name of paletteTokens) root.style.removeProperty(name);
+  paletteTokens = [];
+  root.style.removeProperty('color-scheme');
+  const hex = colorFor(panelColors, currentTheme());
+  const palette = hex && panelPalette(hex);
+  if (!palette) return;
+  root.style.colorScheme = palette.scheme;
+  const { tokens } = panelPalette(hex, tokenColor('--accent'));
+  for (const [name, value] of Object.entries(tokens)) root.style.setProperty(name, value);
+  paletteTokens = Object.keys(tokens);
+}
+
+function loadPanelColor() {
+  darkTheme.addEventListener('change', applyPanelColor);
+  getPanelColors()
+    .then((colors) => {
+      panelColors = colors;
+      applyPanelColor();
+    })
+    .catch((error) => console.error('Failed to read the panel color', error));
+}
+
+async function savePanelColor(hex) {
+  panelColors = withColor(panelColors, currentTheme(), hex);
+  applyPanelColor();
+  await setPanelColors(panelColors);
+}
+
+// What the eyedropper may land on if it is clicked a second time: the panel's background,
+// the button under the pointer and its icon (lib/panel-color.js isOwnColor).
+function ownColors() {
+  const background = parseRgb(getComputedStyle(document.body).backgroundColor).rgb;
+  const style = getComputedStyle(eyedropperEl);
+  const button = parseRgb(style.backgroundColor);
+  const under = button ? over(button.rgb, button.alpha, background) : background;
+  const icon = parseRgb(style.color);
+  return [background, under, icon ? over(icon.rgb, icon.alpha, under) : under];
+}
+
+// A click on the eyedropper: the hint and the browser's eyedropper; picked, cancelled with
+// Esc or clicked again — the hint goes. A color of the panel itself changes nothing; but on a
+// Mac the eyedropper doesn't see pages and catches the second click itself, returning a dark
+// stand-in color (docs/02-architecture.md, "Цвет панели") — "Reset color" undoes it.
+async function pickPanelColor() {
+  if (picking) {
+    picking.abort();
+    return;
+  }
+  const controller = new AbortController();
+  picking = controller;
+  const own = ownColors();
+  eyedropperHint.hidden = false;
+  eyedropperEl.classList.add('is-picking');
+  try {
+    const { sRGBHex } = await new EyeDropper().open({ signal: controller.signal });
+    const hex = parseHex(sRGBHex) ? sRGBHex : parseRgb(sRGBHex) && toHex(parseRgb(sRGBHex).rgb);
+    if (hex && !isOwnColor(hex, own)) await savePanelColor(hex);
+  } catch (error) {
+    if (error?.name !== 'AbortError') console.error('Failed to pick the panel color', error);
+  } finally {
+    if (picking === controller) picking = null;
+    eyedropperHint.hidden = true;
+    eyedropperEl.classList.remove('is-picking');
+  }
+}
+
+function showPanelColorMenu(event) {
+  const theme = currentTheme();
+  openMenu({
+    x: event.clientX,
+    y: event.clientY,
+    items: [{ id: 'reset-color', label: S.panelColor.reset, disabled: !colorFor(panelColors, theme) }],
+    onSelect: () => {
+      panelColors = withColor(panelColors, theme, null);
+      applyPanelColor();
+      setPanelColors(panelColors).catch((error) => console.error('Failed to reset the panel color', error));
+    },
+  });
+}
 
 // ---------- Actions
 
@@ -2283,6 +2431,10 @@ function showContextMenu(event, target) {
 document.addEventListener('contextmenu', (event) => {
   if (event.target.closest('input, textarea')) return;
   event.preventDefault();
+  if (event.target.closest('.eyedropper')) {
+    showPanelColorMenu(event);
+    return;
+  }
   if (!state.rootId) return;
   if (listEl.contains(event.target)) showContextMenu(event, menuTarget(event.target));
   const icon = event.target.closest('.space-icon');
@@ -2723,6 +2875,10 @@ chrome.storage.onChanged.addListener((changes, area) => {
     return;
   }
   if (area !== 'local') return;
+  if (PANEL_COLOR_KEY in changes) {
+    panelColors = parsePanelColors(changes[PANEL_COLOR_KEY].newValue); // here or in another window
+    applyPanelColor();
+  }
   if (changes[ARC_PENDING_KEY]?.newValue) sortArcImport(); // Helium's import from Arc just ended
   if (ROOT_ID_KEY in changes) scheduleLoad();
   if (onPictogramsChanged(changes)) scheduleLoad();
@@ -2755,6 +2911,7 @@ new ResizeObserver(() => {
 
 async function init() {
   followThemeWithActionIcon();
+  loadPanelColor();
   buildOpenTabs();
   let localItems;
   [state.expanded, state.windowId, state.bindings, state.spaceIds, state.session, localItems] =

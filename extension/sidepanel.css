@@ -1039,7 +1039,8 @@ button:focus-visible {
   display: none;
 }
 
-/* Spaces (stage 8): their icons in a bar at the bottom. */
+/* Spaces (stage 8): their icons in a bar at the bottom; at its right end "+" and the eyedropper
+   (stage 9), which stays alone in the bar with spaces off. */
 .spaces {
   position: relative; /* the drop line between icons is placed inside it */
   flex: none;
@@ -1066,7 +1067,8 @@ button:focus-visible {
 }
 
 .space-icon,
-.space-add {
+.space-add,
+.eyedropper {
   flex: none;
   width: var(--space-icon);
   height: var(--space-icon);
@@ -1089,8 +1091,15 @@ button:focus-visible {
 
 .space-icon:hover,
 .space-add:hover,
+.eyedropper:hover,
+.eyedropper.is-picking,
 .space-icon.is-menu-target {
   background: var(--hover);
+}
+
+.space-add[hidden],
+.eyedropper[hidden] {
+  display: none;
 }
 
 .space-icon:hover > *,
@@ -1130,6 +1139,34 @@ button:focus-visible {
   height: var(--icon);
 }
 
+/* Smaller than "+": filled, it looks bigger and darker at the same size. */
+.eyedropper svg {
+  width: var(--eyedropper-icon);
+  height: var(--eyedropper-icon);
+}
+
+/* Over the list, right above the eyedropper, while the browser's eyedropper is open. */
+.eyedropper-hint {
+  position: absolute;
+  right: var(--panel-pad);
+  bottom: calc(100% + var(--menu-pad));
+  z-index: 15;
+  display: flex;
+  align-items: center;
+  height: var(--menu-row-h);
+  padding: 0 var(--pad-x);
+  border-radius: var(--menu-radius);
+  background: var(--surface);
+  color: var(--text);
+  box-shadow: var(--shadow);
+  white-space: nowrap;
+  pointer-events: none;
+}
+
+.eyedropper-hint[hidden] {
+  display: none;
+}
+
 /* The swipe between spaces: the tree and the tabs below the divider follow the fingers
    (--swipe-x is set by the panel), then the new space's content slides in. */
 .list {
@@ -1166,7 +1203,7 @@ button:focus-visible {
 }
 
 /* The toast stays above the bar. */
-body.has-spaces .toast {
+body.has-bar .toast {
   bottom: calc(var(--spacebar-h) + var(--panel-pad));
 }
 

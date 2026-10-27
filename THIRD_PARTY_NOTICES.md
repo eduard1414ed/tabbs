@@ -1,6 +1,6 @@
 # Third-party notices
 
-Tabbs includes icons from **Phosphor Icons** 2.1.1 (<https://phosphoricons.com>, <https://github.com/phosphor-icons/core>): 225 pictograms for folders and spaces, outline and filled, in `extension/lib/pictograms.js` (made by `scripts/pictograms.mjs`). They are used under the MIT License:
+Tabbs includes icons from **Phosphor Icons** 2.1.1 (<https://phosphoricons.com>, <https://github.com/phosphor-icons/core>): 225 pictograms for folders and spaces, outline and filled, in `extension/lib/pictograms.js` (made by `scripts/pictograms.mjs`), and the eyedropper icon (bold) in `extension/sidepanel.js`. They are used under the MIT License:
 
 ```
 MIT License

@@ -5,6 +5,7 @@ import { rootFolderTitles } from './strings.js';
 import { BINDING_PREFIX, bindingKey, parseBindings } from './binding.js';
 import { hasBuiltInArcImport } from './arc-import.js';
 import { themeOf, isTheme, actionIconPaths } from './action-icon.js';
+import { PANEL_COLOR_KEY, parsePanelColors } from './panel-color.js';
 import {
   SPACES_KEY,
   SPACES_BEFORE_KEY,
@@ -270,6 +271,17 @@ export async function getSpaceIds() {
 }
 
 export const setSpaceIds = (ids) => chrome.storage.local.set({ [SPACES_KEY]: ids });
+
+// The panel's own colors by theme (stage 9, lib/panel-color.js); {} — the usual colors.
+export async function getPanelColors() {
+  const { [PANEL_COLOR_KEY]: colors } = await chrome.storage.local.get(PANEL_COLOR_KEY);
+  return parsePanelColors(colors);
+}
+
+export const setPanelColors = (colors) =>
+  Object.keys(colors).length
+    ? chrome.storage.local.set({ [PANEL_COLOR_KEY]: colors })
+    : chrome.storage.local.remove(PANEL_COLOR_KEY);
 
 // The spaces when they were last turned off: ticked when turning them on again.
 export async function getSpacesBefore() {
