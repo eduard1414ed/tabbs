@@ -16,9 +16,9 @@ A small extension for everyone who got used to tabs in Arc. Tabbs adds a side pa
 
 ## Install
 
-**Chrome Web Store:** coming soon.
+**Chrome Web Store:** [Tabbs](https://chromewebstore.google.com/detail/tabbs/ildcgodlkfahmmfdfjnjcghpgoecminp)
 
-**From the source**, until then:
+**From the source:**
 
 1. Download this repository (Code → Download ZIP) and unzip it somewhere it will stay — the browser loads the extension from that folder.
 2. Open `chrome://extensions` (in Helium: `helium://extensions`) and turn on **Developer mode** in the top right corner.
